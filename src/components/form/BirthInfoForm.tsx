@@ -69,7 +69,7 @@ export function BirthInfoForm({ onSubmit }: Props) {
 
       <div className="grid grid-cols-4 gap-4 mb-4">
         <label className="col-span-1 text-right pt-2">Ngày tháng năm sinh</label>
-        <div className="col-span-2 flex gap-2">
+        <div className="col-span-3 flex gap-2">
           <select
             value={formData.ngaySinh}
             onChange={(e) => handleChange('ngaySinh', parseInt(e.target.value))}
@@ -99,7 +99,11 @@ export function BirthInfoForm({ onSubmit }: Props) {
             max="2100"
           />
         </div>
-        <div className="col-span-1 flex items-center">
+      </div>
+
+      <div className="grid grid-cols-4 gap-4 mb-4">
+        <label className="col-span-1"></label>
+        <div className="col-span-3">
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
