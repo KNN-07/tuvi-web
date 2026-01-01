@@ -9,10 +9,11 @@ export interface Sao {
   saoID: number;
   saoTen: string;
   saoNguHanh: NguHanh;
-  saoLoai: number; // 1=Chinh tinh, <10=tot, >10=xau
+  saoLoai: number;
   cssSao: string;
   saoDacTinh: DacTinh;
   vongTrangSinh: 0 | 1;
+  isLuu?: boolean;
 }
 
 // Palace (Cung)
@@ -57,20 +58,28 @@ export interface ThienBan {
   today: string;
 }
 
-// Complete Chart Data
+export interface LuuNien {
+  nam: number;
+  canNam: number;
+  chiNam: number;
+  canTen: string;
+  chiTen: string;
+}
+
 export interface ChartData {
   thienBan: ThienBan;
   thapNhiCung: Cung[];
+  luuNien?: LuuNien;
 }
 
-// Form Input
 export interface BirthInfo {
   hoTen: string;
   ngaySinh: number;
   thangSinh: number;
   namSinh: number;
-  gioSinh: number; // 1-12
+  gioSinh: number;
   gioiTinh: 'nam' | 'nu';
   amLich: boolean;
   muiGio: number;
+  luuNienNam?: number;
 }

@@ -6,8 +6,11 @@ interface Props {
 }
 
 export function Star({ sao, isChinhTinh }: Props) {
+  const luuStyle = sao.isLuu ? 'text-red-600 font-medium' : '';
+  const baseStyle = sao.isLuu ? '' : sao.cssSao;
+  
   return (
-    <span className={`${sao.cssSao} ${isChinhTinh ? 'font-bold uppercase' : ''}`}>
+    <span className={`${baseStyle} ${luuStyle} ${isChinhTinh ? 'font-bold uppercase' : ''}`}>
       {sao.saoTen}
       {sao.saoDacTinh && ` (${sao.saoDacTinh})`}
     </span>

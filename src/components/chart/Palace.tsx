@@ -8,10 +8,13 @@ interface Props {
 }
 
 export function Palace({ cung, isHighlighted, onClick }: Props) {
-  const chinhTinh = cung.cungSao.filter(s => s.saoLoai === 1);
-  const phuTinhTot = cung.cungSao.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai < 10);
-  const phuTinhXau = cung.cungSao.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai >= 10);
-  const trangSinh = cung.cungSao.find(s => s.vongTrangSinh === 1);
+  const regularStars = cung.cungSao.filter(s => !s.isLuu);
+  const luuStars = cung.cungSao.filter(s => s.isLuu);
+  
+  const chinhTinh = regularStars.filter(s => s.saoLoai === 1);
+  const phuTinhTot = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai < 10);
+  const phuTinhXau = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai >= 10);
+  const trangSinh = regularStars.find(s => s.vongTrangSinh === 1);
 
   return (
     <div
@@ -51,6 +54,16 @@ export function Palace({ cung, isHighlighted, onClick }: Props) {
             ))}
           </div>
         </div>
+        
+        {luuStars.length > 0 && (
+          <div className="mt-1 pt-1 border-t border-dashed border-red-200">
+            <div className="flex flex-wrap gap-x-1 text-[9px]">
+              {luuStars.map((sao, i) => (
+                <span key={i}><Star sao={sao} /></span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tuan/Triet badges */}

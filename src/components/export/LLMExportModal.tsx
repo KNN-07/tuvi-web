@@ -35,7 +35,9 @@ function formatSao(sao: Sao): string {
 function formatCung(cung: Cung): string {
   const lines: string[] = [];
   
-  // Palace header
+  const regularStars = cung.cungSao.filter(s => !s.isLuu);
+  const luuStars = cung.cungSao.filter(s => s.isLuu);
+  
   const cungHeader = cung.cungChu ? `【${cung.cungChu}】- Cung ${cung.cungTen}` : `Cung ${cung.cungTen}`;
   lines.push(cungHeader);
   lines.push(`  Hành: ${cung.hanhCung}, Âm Dương: ${cung.cungAmDuong === 1 ? 'Dương' : 'Âm'}`);
@@ -51,11 +53,10 @@ function formatCung(cung: Cung): string {
     lines.push(`  ⚠ Triệt Lộ`);
   }
 
-  // Stars
-  const chinhTinh = cung.cungSao.filter(s => s.saoLoai === 1);
-  const phuTinhTot = cung.cungSao.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai < 10);
-  const phuTinhXau = cung.cungSao.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai >= 10);
-  const trangSinh = cung.cungSao.filter(s => s.vongTrangSinh === 1);
+  const chinhTinh = regularStars.filter(s => s.saoLoai === 1);
+  const phuTinhTot = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai < 10);
+  const phuTinhXau = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai >= 10);
+  const trangSinh = regularStars.filter(s => s.vongTrangSinh === 1);
 
   if (chinhTinh.length > 0) {
     lines.push(`  Chính tinh: ${chinhTinh.map(s => formatSao(s)).join(', ')}`);
@@ -69,12 +70,15 @@ function formatCung(cung: Cung): string {
   if (trangSinh.length > 0) {
     lines.push(`  Vòng Tràng Sinh: ${trangSinh.map(s => s.saoTen).join(', ')}`);
   }
+  if (luuStars.length > 0) {
+    lines.push(`  🔴 Lưu niên: ${luuStars.map(s => s.saoTen).join(', ')}`);
+  }
 
   return lines.join('\n');
 }
 
 export function generateLLMPrompt(chartData: ChartData): string {
-  const { thienBan, thapNhiCung } = chartData;
+  const { thienBan, thapNhiCung, luuNien } = chartData;
 
   const lines: string[] = [];
 
@@ -96,6 +100,14 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push(`- Âm Dương năm sinh: ${thienBan.amDuongNamSinh}`);
   lines.push(`- Âm Dương mệnh: ${thienBan.amDuongMenh}`);
   lines.push(`- Sinh khắc: ${thienBan.sinhKhac}`);
+  
+  if (luuNien) {
+    lines.push('');
+    lines.push('## LƯU NIÊN (Năm xem vận hạn)');
+    lines.push(`- Năm: ${luuNien.nam} (${luuNien.canTen} ${luuNien.chiTen})`);
+    lines.push('- Các sao Lưu niên được đánh dấu 🔴 trong từng cung bên dưới');
+  }
+  
   lines.push('');
   lines.push('## THẬP NHỊ CUNG');
   lines.push('');
@@ -133,8 +145,18 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push('6. **Tình duyên - Phu Thê** (X/10): Vận đào hoa, hôn nhân.');
   lines.push('7. **Sức khỏe - Tật Ách** (X/10): Những vấn đề sức khỏe cần lưu ý.');
   lines.push('8. **Gia đạo - Phụ Mẫu, Huynh Đệ, Tử Tức** (X/10): Quan hệ gia đình.');
+  
+  if (luuNien) {
+    lines.push(`9. **Vận hạn năm ${luuNien.nam} (${luuNien.canTen} ${luuNien.chiTen})** (X/10): Phân tích các sao Lưu niên (đánh dấu 🔴), dự báo sự kiện, cơ hội và thách thức trong năm.`);
+  }
+  
   lines.push('');
   lines.push('**Lưu ý đặc biệt**: Các cách cục đặc biệt (nếu có), Tuần Trung, Triệt Lộ, Tam Hợp, Xung Chiếu.');
+  
+  if (luuNien) {
+    lines.push(`**Sao Lưu niên quan trọng**: L.Thái Tuế, L.Lộc Tồn, L.Kình Dương, L.Đà La, L.Thiên Mã, L.Tang Môn, L.Bạch Hổ, L.Tứ Hóa.`);
+  }
+  
   lines.push('');
   lines.push('## ĐỊNH DẠNG KẾT QUẢ');
   lines.push('');
@@ -152,6 +174,11 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push('| Tình duyên | X/10 |');
   lines.push('| Sức khỏe | X/10 |');
   lines.push('| Gia đạo | X/10 |');
+  
+  if (luuNien) {
+    lines.push(`| Vận hạn ${luuNien.nam} | X/10 |`);
+  }
+  
   lines.push('| **TỔNG ĐIỂM TRUNG BÌNH** | **X/10** |');
   lines.push('');
   lines.push('Xin trình bày rõ ràng, dễ hiểu, và đưa ra những lời khuyên thiết thực.');

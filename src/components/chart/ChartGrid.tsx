@@ -84,7 +84,7 @@ export function ChartGrid({ chartData, onExport }: Props) {
 
         {/* Center Panel (spans 2x2) */}
         <div style={{ gridArea: '2 / 2 / 4 / 4' }}>
-          <CenterPanel thienBan={chartData.thienBan} onClear={clearHighlight} />
+          <CenterPanel thienBan={chartData.thienBan} luuNien={chartData.luuNien} onClear={clearHighlight} />
         </div>
       </div>
 

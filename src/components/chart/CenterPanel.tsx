@@ -1,11 +1,12 @@
-import type { ThienBan } from '../../types/chart';
+import type { ThienBan, LuuNien } from '../../types/chart';
 
 interface Props {
   thienBan: ThienBan;
+  luuNien?: LuuNien;
   onClear: () => void;
 }
 
-export function CenterPanel({ thienBan, onClear }: Props) {
+export function CenterPanel({ thienBan, luuNien, onClear }: Props) {
   return (
     <div onClick={onClear} className="p-3 h-full bg-white border border-gray-400 text-sm cursor-pointer">
       <div className="text-center font-bold mb-2">Ngày xem: {thienBan.today}</div>
@@ -55,6 +56,13 @@ export function CenterPanel({ thienBan, onClear }: Props) {
         <span className="font-bold">Thân chủ</span>
         <span className="col-span-2">{thienBan.thanChu}</span>
       </div>
+      
+      {luuNien && (
+        <div className="grid grid-cols-3 gap-1 mb-1 bg-red-50 p-1 rounded">
+          <span className="font-bold text-red-700">Lưu Niên</span>
+          <span className="col-span-2 text-red-700">{luuNien.nam} ({luuNien.canTen} {luuNien.chiTen})</span>
+        </div>
+      )}
       
       <div className="text-center font-bold mt-2">{thienBan.sinhKhac}</div>
       

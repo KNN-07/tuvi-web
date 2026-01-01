@@ -1,5 +1,4 @@
-// Main Tu Vi chart calculation engine (ported from App.py)
-import type { BirthInfo, ChartData, Cung, Sao, ThienBan } from '../types/chart';
+import type { BirthInfo, ChartData, Cung, Sao, ThienBan, LuuNien } from '../types/chart';
 import { THIEN_CAN, DIA_CHI, HANH_CUNG } from '../utils/constants';
 import { solarToLunar, jdFromDate } from './calendar';
 import {
@@ -9,6 +8,11 @@ import {
   ngayThangNamCanChi, canChiNgay, sinhKhac
 } from './amduong';
 import * as SAO from './sao';
+import {
+  calculateLuuStars, getYearCanChi, getLuuStarsForPalace,
+  saoLuuHoaLoc, saoLuuHoaQuyen, saoLuuHoaKhoa, saoLuuHoaKy,
+  LUU_TU_HOA_TABLE
+} from './luu';
 
 // Create empty palace
 function createCung(cungSo: number): Cung {
@@ -35,7 +39,7 @@ function addSao(cungs: Cung[], cungSo: number, ...saos: Sao[]): void {
 
 // Main chart calculation
 export function calculateChart(input: BirthInfo): ChartData {
-  const { hoTen, ngaySinh, thangSinh, namSinh, gioSinh, gioiTinh, amLich, muiGio } = input;
+  const { hoTen, ngaySinh, thangSinh, namSinh, gioSinh, gioiTinh, amLich, muiGio, luuNienNam } = input;
   const gioiTinhNum = gioiTinh === 'nam' ? 1 : -1;
   
   // Convert to lunar if needed
@@ -336,7 +340,78 @@ export function calculateChart(input: BirthInfo): ChartData {
   thapNhiCung[viTriTriet1].trietLo = true;
   thapNhiCung[viTriTriet2].trietLo = true;
   
-  // Build Thien Ban
+  let luuNienData: LuuNien | undefined;
+  if (luuNienNam) {
+    const [luuCan, luuChi] = getYearCanChi(luuNienNam);
+    const luuPositions = calculateLuuStars(luuCan, luuChi);
+    
+    const starPositionMap: Record<string, number> = {
+      'Tử Vi': viTriTuVi,
+      'Liêm Trinh': viTriLiemTrinh,
+      'Thiên Đồng': viTriThienDong,
+      'Vũ Khúc': viTriVuKhuc,
+      'Thái Dương': viTriThaiDuong,
+      'Thiên Cơ': viTriThienCo,
+      'Thiên Phủ': viTriThienPhu,
+      'Thái Âm': viTriThaiAm,
+      'Tham Lang': viTriThamLang,
+      'Cự Môn': viTriCuMon,
+      'Thiên Tướng': viTriThienTuong,
+      'Thiên Lương': viTriThienLuong,
+      'Thất Sát': viTriThatSat,
+      'Phá Quân': viTriPhaQuan,
+      'Văn Xương': viTriVanXuong,
+      'Văn Khúc': viTriVanKhuc,
+      'Tả Phù': viTriTaPhu,
+      'Hữu Bật': viTriHuuBat,
+    };
+    
+    for (let i = 1; i <= 12; i++) {
+      const luuStars = getLuuStarsForPalace(luuPositions, i);
+      for (const star of luuStars) {
+        star.isLuu = true;
+        thapNhiCung[i].cungSao.push(star);
+      }
+    }
+    
+    const tuHoaInfo = LUU_TU_HOA_TABLE[luuCan];
+    if (tuHoaInfo) {
+      const locPos = starPositionMap[tuHoaInfo.loc];
+      const quyenPos = starPositionMap[tuHoaInfo.quyen];
+      const khoaPos = starPositionMap[tuHoaInfo.khoa];
+      const kyPos = starPositionMap[tuHoaInfo.ky];
+      
+      if (locPos) {
+        const star = saoLuuHoaLoc();
+        star.isLuu = true;
+        thapNhiCung[locPos].cungSao.push(star);
+      }
+      if (quyenPos) {
+        const star = saoLuuHoaQuyen();
+        star.isLuu = true;
+        thapNhiCung[quyenPos].cungSao.push(star);
+      }
+      if (khoaPos) {
+        const star = saoLuuHoaKhoa();
+        star.isLuu = true;
+        thapNhiCung[khoaPos].cungSao.push(star);
+      }
+      if (kyPos) {
+        const star = saoLuuHoaKy();
+        star.isLuu = true;
+        thapNhiCung[kyPos].cungSao.push(star);
+      }
+    }
+    
+    luuNienData = {
+      nam: luuNienNam,
+      canNam: luuCan,
+      chiNam: luuChi,
+      canTen: THIEN_CAN[luuCan]?.tenCan || '',
+      chiTen: DIA_CHI[luuChi]?.tenChi || '',
+    };
+  }
+  
   const canGioSinh = ((jdFromDate(ngaySinh, thangSinh, namSinh) - 1) * 2 % 10 + gioSinh) % 10 || 10;
   const cungAmDuong = cungMenh % 2 === 1 ? 1 : -1;
   const amDuongMenh = (cungAmDuong * gioiTinhNum === 1)
@@ -374,6 +449,7 @@ export function calculateChart(input: BirthInfo): ChartData {
   
   return {
     thienBan,
-    thapNhiCung: thapNhiCung.slice(1), // Remove index 0
+    thapNhiCung: thapNhiCung.slice(1),
+    luuNien: luuNienData,
   };
 }

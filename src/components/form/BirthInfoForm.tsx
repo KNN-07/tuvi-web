@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { BirthInfo } from '../../types/chart';
-import { GIO_SINH_OPTIONS } from '../../utils/constants';
+import { GIO_SINH_OPTIONS, THIEN_CAN, DIA_CHI } from '../../utils/constants';
+import { getYearCanChi } from '../../lib/luu';
 
 interface Props {
   onSubmit: (data: BirthInfo) => void;
@@ -8,15 +9,17 @@ interface Props {
 
 export function BirthInfoForm({ onSubmit }: Props) {
   const today = new Date();
+  const currentYear = today.getFullYear();
   const [formData, setFormData] = useState<BirthInfo>({
     hoTen: '',
     ngaySinh: today.getDate(),
     thangSinh: today.getMonth() + 1,
-    namSinh: today.getFullYear(),
+    namSinh: currentYear,
     gioSinh: 1,
     gioiTinh: 'nam',
     amLich: false,
     muiGio: 7,
+    luuNienNam: currentYear,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,6 +30,15 @@ export function BirthInfoForm({ onSubmit }: Props) {
   const handleChange = (field: keyof BirthInfo, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+
+  const getLuuNienLabel = (year: number): string => {
+    const [can, chi] = getYearCanChi(year);
+    const canTen = THIEN_CAN[can]?.tenCan || '';
+    const chiTen = DIA_CHI[chi]?.tenChi || '';
+    return `${year} (${canTen} ${chiTen})`;
+  };
+
+  const luuNienYears = Array.from({ length: 21 }, (_, i) => currentYear - 10 + i);
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md border border-red-600">
@@ -120,6 +132,20 @@ export function BirthInfoForm({ onSubmit }: Props) {
             <option key={tz} value={tz}>{tz >= 0 ? `+${tz}` : tz}{tz === 7 ? ' (Vietnam)' : ''}</option>
           ))}
         </select>
+      </div>
+
+      <div className="grid grid-cols-4 gap-4 mb-4">
+        <label className="col-span-1 text-right pt-2">Lưu Niên</label>
+        <select
+          value={formData.luuNienNam}
+          onChange={(e) => handleChange('luuNienNam', parseInt(e.target.value))}
+          className="col-span-2 border rounded px-2 py-2"
+        >
+          {luuNienYears.map(year => (
+            <option key={year} value={year}>{getLuuNienLabel(year)}</option>
+          ))}
+        </select>
+        <div className="text-xs text-gray-500 pt-2">Năm xem vận hạn</div>
       </div>
 
       <div className="text-center">
