@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Noto Serif', serif;
+  background-color: #f5f5f5;
+}
+
+.hanh-kim { color: #9E9E9E; }
+.hanh-moc { color: #4CAF50; }
+.hanh-thuy { color: #000100; }
+.hanh-hoa { color: #a71a14; }
+.hanh-tho { color: #e6bd37; }
+
+.hanhKim { color: #9E9E9E; }
+.hanhMoc { color: #4CAF50; }
+.hanhThuy { color: #000100; }
+.hanhHoa { color: #a71a14; }
+.hanhTho { color: #e6bd37; }
