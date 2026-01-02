@@ -6,6 +6,8 @@ import { useHighlight } from '../../hooks/useHighlight';
 interface Props {
   chartData: ChartData;
   onExport: () => void;
+  showLuuStars: boolean;
+  onToggleLuuStars: () => void;
 }
 
 /**
@@ -20,7 +22,7 @@ interface Props {
  * Note: cungSo is 1-based, maps to Địa Chi:
  * 1=Tý, 2=Sửu, 3=Dần, 4=Mão, 5=Thìn, 6=Tỵ, 7=Ngọ, 8=Mùi, 9=Thân, 10=Dậu, 11=Tuất, 12=Hợi
  */
-export function ChartGrid({ chartData, onExport }: Props) {
+export function ChartGrid({ chartData, onExport, showLuuStars, onToggleLuuStars }: Props) {
   const { isHighlighted, handlePalaceClick, clearHighlight } = useHighlight();
   
   const getCung = (cungSo: number) => {
@@ -50,8 +52,20 @@ export function ChartGrid({ chartData, onExport }: Props) {
 
   return (
     <div className="w-full max-w-5xl mx-auto">
-      {/* Export button */}
-      <div className="flex justify-end mb-2">
+      {/* Action buttons */}
+      <div className="flex justify-end gap-2 mb-2">
+        {chartData.luuNien && (
+          <button
+            onClick={() => onToggleLuuStars()}
+            className={`px-4 py-2 rounded font-medium ${
+              showLuuStars
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+            }`}
+          >
+            {showLuuStars ? 'Ẩn' : 'Hiện'} sao Lưu {chartData.luuNien.nam}
+          </button>
+        )}
         <button
           onClick={onExport}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium"
@@ -77,6 +91,7 @@ export function ChartGrid({ chartData, onExport }: Props) {
                 cung={cung}
                 isHighlighted={isHighlighted(cungSo)}
                 onClick={() => handlePalaceClick(cungSo)}
+                showLuuStars={showLuuStars}
               />
             </div>
           );

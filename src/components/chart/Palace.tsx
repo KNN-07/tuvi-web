@@ -5,11 +5,12 @@ interface Props {
   cung: Cung;
   isHighlighted: boolean;
   onClick: () => void;
+  showLuuStars?: boolean;
 }
 
-export function Palace({ cung, isHighlighted, onClick }: Props) {
+export function Palace({ cung, isHighlighted, onClick, showLuuStars = true }: Props) {
   const regularStars = cung.cungSao.filter(s => !s.isLuu);
-  const luuStars = cung.cungSao.filter(s => s.isLuu);
+  const luuStars = showLuuStars ? cung.cungSao.filter(s => s.isLuu) : [];
   
   const chinhTinh = regularStars.filter(s => s.saoLoai === 1);
   const phuTinhTot = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai < 10);

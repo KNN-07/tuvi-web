@@ -5,6 +5,7 @@ interface Props {
   chartData: ChartData;
   isOpen: boolean;
   onClose: () => void;
+  showLuuStars?: boolean;
 }
 
 // Map element codes to Vietnamese names
@@ -32,11 +33,11 @@ function formatSao(sao: Sao): string {
   return `${sao.saoTen} - ${hanh}${dacTinh}${loai}`;
 }
 
-function formatCung(cung: Cung): string {
+function formatCung(cung: Cung, includeLuuStars: boolean = true): string {
   const lines: string[] = [];
   
   const regularStars = cung.cungSao.filter(s => !s.isLuu);
-  const luuStars = cung.cungSao.filter(s => s.isLuu);
+  const luuStars = includeLuuStars ? cung.cungSao.filter(s => s.isLuu) : [];
   
   const cungHeader = cung.cungChu ? `【${cung.cungChu}】- Cung ${cung.cungTen}` : `Cung ${cung.cungTen}`;
   lines.push(cungHeader);
@@ -77,8 +78,9 @@ function formatCung(cung: Cung): string {
   return lines.join('\n');
 }
 
-export function generateLLMPrompt(chartData: ChartData): string {
+export function generateLLMPrompt(chartData: ChartData, includeLuuStars: boolean = true): string {
   const { thienBan, thapNhiCung, luuNien } = chartData;
+  const showLuuNien = includeLuuStars && !!luuNien;
 
   const lines: string[] = [];
 
@@ -101,10 +103,10 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push(`- Âm Dương mệnh: ${thienBan.amDuongMenh}`);
   lines.push(`- Sinh khắc: ${thienBan.sinhKhac}`);
   
-  if (luuNien) {
+  if (showLuuNien) {
     lines.push('');
     lines.push('## LƯU NIÊN (Năm xem vận hạn)');
-    lines.push(`- Năm: ${luuNien.nam} (${luuNien.canTen} ${luuNien.chiTen})`);
+    lines.push(`- Năm: ${luuNien!.nam} (${luuNien!.canTen} ${luuNien!.chiTen})`);
     lines.push('- Các sao Lưu niên được đánh dấu 🔴 trong từng cung bên dưới');
   }
   
@@ -118,16 +120,16 @@ export function generateLLMPrompt(chartData: ChartData): string {
   const otherCungs = thapNhiCung.filter(c => c !== menhCung && c !== thanCung);
 
   if (menhCung) {
-    lines.push(formatCung(menhCung));
+    lines.push(formatCung(menhCung, includeLuuStars));
     lines.push('');
   }
   if (thanCung && thanCung !== menhCung) {
-    lines.push(formatCung(thanCung));
+    lines.push(formatCung(thanCung, includeLuuStars));
     lines.push('');
   }
 
   for (const cung of otherCungs) {
-    lines.push(formatCung(cung));
+    lines.push(formatCung(cung, includeLuuStars));
     lines.push('');
   }
 
@@ -146,14 +148,14 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push('7. **Sức khỏe - Tật Ách** (X/10): Những vấn đề sức khỏe cần lưu ý.');
   lines.push('8. **Gia đạo - Phụ Mẫu, Huynh Đệ, Tử Tức** (X/10): Quan hệ gia đình.');
   
-  if (luuNien) {
-    lines.push(`9. **Vận hạn năm ${luuNien.nam} (${luuNien.canTen} ${luuNien.chiTen})** (X/10): Phân tích các sao Lưu niên (đánh dấu 🔴), dự báo sự kiện, cơ hội và thách thức trong năm.`);
+  if (showLuuNien) {
+    lines.push(`9. **Vận hạn năm ${luuNien!.nam} (${luuNien!.canTen} ${luuNien!.chiTen})** (X/10): Phân tích các sao Lưu niên (đánh dấu 🔴), dự báo sự kiện, cơ hội và thách thức trong năm.`);
   }
   
   lines.push('');
   lines.push('**Lưu ý đặc biệt**: Các cách cục đặc biệt (nếu có), Tuần Trung, Triệt Lộ, Tam Hợp, Xung Chiếu.');
   
-  if (luuNien) {
+  if (showLuuNien) {
     lines.push(`**Sao Lưu niên quan trọng**: L.Thái Tuế, L.Lộc Tồn, L.Kình Dương, L.Đà La, L.Thiên Mã, L.Tang Môn, L.Bạch Hổ, L.Tứ Hóa.`);
   }
   
@@ -175,8 +177,8 @@ export function generateLLMPrompt(chartData: ChartData): string {
   lines.push('| Sức khỏe | X/10 |');
   lines.push('| Gia đạo | X/10 |');
   
-  if (luuNien) {
-    lines.push(`| Vận hạn ${luuNien.nam} | X/10 |`);
+  if (showLuuNien) {
+    lines.push(`| Vận hạn ${luuNien!.nam} | X/10 |`);
   }
   
   lines.push('| **TỔNG ĐIỂM TRUNG BÌNH** | **X/10** |');
@@ -186,12 +188,12 @@ export function generateLLMPrompt(chartData: ChartData): string {
   return lines.join('\n');
 }
 
-export function LLMExportModal({ chartData, isOpen, onClose }: Props) {
+export function LLMExportModal({ chartData, isOpen, onClose, showLuuStars = true }: Props) {
   const [copied, setCopied] = useState(false);
   
   if (!isOpen) return null;
 
-  const prompt = generateLLMPrompt(chartData);
+  const prompt = generateLLMPrompt(chartData, showLuuStars);
 
   const handleCopy = async () => {
     try {

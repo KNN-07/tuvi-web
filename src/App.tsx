@@ -8,6 +8,7 @@ import { calculateChart } from './lib/tuvi';
 export default function App() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showLuuStars, setShowLuuStars] = useState(true);
 
   const handleSubmit = (birthInfo: BirthInfo) => {
     try {
@@ -59,13 +60,19 @@ export default function App() {
             </div>
 
             {/* Chart Grid */}
-            <ChartGrid chartData={chartData} onExport={handleExport} />
+            <ChartGrid
+              chartData={chartData}
+              onExport={handleExport}
+              showLuuStars={showLuuStars}
+              onToggleLuuStars={() => setShowLuuStars(!showLuuStars)}
+            />
 
             {/* Export Modal */}
             <LLMExportModal
               chartData={chartData}
               isOpen={showExportModal}
               onClose={handleCloseModal}
+              showLuuStars={showLuuStars}
             />
           </div>
         )}
