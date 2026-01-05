@@ -69,34 +69,24 @@ export function BirthInfoForm({ onSubmit }: Props) {
 
       <div className="grid grid-cols-4 gap-4 mb-4">
         <label className="col-span-1 text-right pt-2">Ngày tháng năm sinh</label>
-        <div className="col-span-3 flex gap-2">
-          <select
-            value={formData.ngaySinh}
-            onChange={(e) => handleChange('ngaySinh', parseInt(e.target.value))}
-            className="border rounded px-2 py-2"
-          >
-            {Array.from({ length: 31 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}</option>
-            ))}
-          </select>
-          <span className="pt-2">/</span>
-          <select
-            value={formData.thangSinh}
-            onChange={(e) => handleChange('thangSinh', parseInt(e.target.value))}
-            className="border rounded px-2 py-2"
-          >
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>{i + 1}</option>
-            ))}
-          </select>
-          <span className="pt-2">/</span>
+        <div className="col-span-3">
           <input
-            type="number"
-            value={formData.namSinh}
-            onChange={(e) => handleChange('namSinh', parseInt(e.target.value))}
-            className="border rounded px-2 py-2 w-24"
-            min="1900"
-            max="2100"
+            type="date"
+            value={`${formData.namSinh}-${String(formData.thangSinh).padStart(2, '0')}-${String(formData.ngaySinh).padStart(2, '0')}`}
+            onChange={(e) => {
+              const date = new Date(e.target.value);
+              if (!isNaN(date.getTime())) {
+                setFormData(prev => ({
+                  ...prev,
+                  ngaySinh: date.getDate(),
+                  thangSinh: date.getMonth() + 1,
+                  namSinh: date.getFullYear(),
+                }));
+              }
+            }}
+            className="border rounded px-3 py-2 w-full"
+            min="1900-01-01"
+            max="2100-12-31"
           />
         </div>
       </div>
