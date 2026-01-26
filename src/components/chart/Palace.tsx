@@ -17,48 +17,74 @@ export function Palace({ cung, isHighlighted, onClick, showLuuStars = true }: Pr
   const phuTinhXau = regularStars.filter(s => s.vongTrangSinh === 0 && s.saoLoai !== 1 && s.saoLoai >= 10);
   const trangSinh = regularStars.find(s => s.vongTrangSinh === 1);
 
+  // Background color logic based on state
+  const bgClass = isHighlighted 
+    ? 'bg-amber-50 ring-2 ring-inset ring-amber-400' 
+    : 'bg-white hover:bg-stone-50';
+
   return (
     <div
       onClick={onClick}
-      className={`border border-gray-400 p-1 cursor-pointer text-xs h-full flex flex-col
-        ${isHighlighted ? 'bg-amber-100' : 'bg-white hover:bg-gray-50'}`}
+      className={`h-full flex flex-col p-2 cursor-pointer transition-colors duration-200 select-none ${bgClass}`}
     >
-      {/* Top row */}
-      <div className="flex justify-between border-b pb-1 mb-1">
-        <span className="font-medium">{cung.cungTen}</span>
-        <span className="text-center flex-1">
-          {cung.cungChu && <span className="uppercase font-bold">{cung.cungChu}</span>}
-          {cung.cungThan && <span className="ml-1 bg-red-800 text-white px-1 rounded text-[10px]">Thân</span>}
-        </span>
-        <span className="text-gray-600">{cung.cungDaiHan}</span>
+      {/* Header: Name & Dai Han */}
+      <div className="flex justify-between items-start border-b border-stone-100 pb-1 mb-1">
+        <div className="flex flex-col items-center min-w-[30px]">
+           <span className="font-bold text-lg leading-none font-serif text-stone-800">{cung.cungTen}</span>
+           {/* Cung Than Badge */}
+           {cung.cungThan && (
+             <span className="mt-0.5 bg-red-800 text-white text-[9px] px-1.5 py-[1px] rounded-full uppercase tracking-wider font-bold shadow-sm">
+               Thân
+             </span>
+           )}
+        </div>
+        
+        {/* Cung Chu (Can Chi of Palace) */}
+        {cung.cungChu && (
+           <div className="flex-1 text-center opacity-20 font-serif font-bold text-3xl pointer-events-none select-none">
+              {cung.cungChu}
+           </div>
+        )}
+        
+        <div className="font-mono font-bold text-stone-400 text-lg leading-none">{cung.cungDaiHan}</div>
       </div>
 
-      {/* Middle - Stars */}
-      <div className="flex-1 overflow-hidden">
+      {/* Main Content - Stars */}
+      <div className="flex-1 overflow-hidden flex flex-col gap-1">
+        
         {/* Chinh Tinh */}
-        <div className="mb-1 min-h-[20px]">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 min-h-[24px]">
           {chinhTinh.map((sao, i) => (
             <div key={i}><Star sao={sao} isChinhTinh /></div>
           ))}
+          {chinhTinh.length === 0 && (
+             <span className="text-stone-300 italic text-xs w-full text-center py-1">Vô Chính Diệu</span>
+          )}
         </div>
 
-        {/* Phu Tinh */}
-        <div className="flex gap-1 text-[10px]">
-          <div className="flex-1">
-            {phuTinhTot.slice(0, 6).map((sao, i) => (
+        {/* Phu Tinh - Tot & Xau split or mixed? Traditional is often mixed or split L/R */}
+        <div className="flex gap-2 text-[11px] leading-tight flex-1">
+          {/* Left Column: Good Stars */}
+          <div className="flex-1 flex flex-col gap-0.5">
+            {phuTinhTot.slice(0, 8).map((sao, i) => (
               <div key={i}><Star sao={sao} /></div>
             ))}
+            {phuTinhTot.length > 8 && <span className="text-stone-400 text-[9px]">+...</span>}
           </div>
-          <div className="flex-1 text-right">
-            {phuTinhXau.slice(0, 6).map((sao, i) => (
+          
+          {/* Right Column: Bad Stars */}
+          <div className="flex-1 flex flex-col gap-0.5 items-end text-right">
+            {phuTinhXau.slice(0, 8).map((sao, i) => (
               <div key={i}><Star sao={sao} /></div>
             ))}
+            {phuTinhXau.length > 8 && <span className="text-stone-400 text-[9px]">+...</span>}
           </div>
         </div>
-        
+
+        {/* Luu Stars Section */}
         {luuStars.length > 0 && (
-          <div className="mt-1 pt-1 border-t border-dashed border-red-200">
-            <div className="flex flex-wrap gap-x-1 text-[9px]">
+          <div className="pt-1 border-t border-dashed border-red-100 mt-auto">
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-0.5 text-[10px]">
               {luuStars.map((sao, i) => (
                 <span key={i}><Star sao={sao} /></span>
               ))}
@@ -67,19 +93,27 @@ export function Palace({ cung, isHighlighted, onClick, showLuuStars = true }: Pr
         )}
       </div>
 
-      {/* Tuan/Triet badges */}
-      {(cung.tuanTrung || cung.trietLo) && (
-        <div className="text-center py-1">
-          {cung.trietLo && <span className="bg-gray-800 text-white px-1 rounded text-[10px] mr-1">Triệt</span>}
-          {cung.tuanTrung && <span className="bg-yellow-900 text-white px-1 rounded text-[10px]">Tuần</span>}
-        </div>
-      )}
+      {/* Footer info: Tieu Han, Trang Sinh, Am Duong */}
+      <div className="mt-1 pt-1 border-t border-stone-100 flex justify-between items-end text-[10px] text-stone-500 font-medium relative">
+         {/* Tuan/Triet Overlay Badges - positioned absolutely or strictly? 
+             Let's put them absolute near bottom corners or inline if space permits.
+             Using absolute for distinct look.
+         */}
+         <div className="absolute bottom-4 right-0 flex flex-col items-end pointer-events-none opacity-90">
+            {cung.trietLo && <span className="bg-stone-800 text-white px-1.5 py-[1px] rounded text-[9px] uppercase font-bold mb-0.5 shadow-sm">Triệt</span>}
+            {cung.tuanTrung && <span className="bg-stone-500 text-white px-1.5 py-[1px] rounded text-[9px] uppercase font-bold shadow-sm">Tuần</span>}
+         </div>
 
-      {/* Bottom row */}
-      <div className="flex justify-between border-t pt-1 mt-1 text-[10px]">
-        <span>{cung.cungTieuHan}</span>
-        <span className={trangSinh?.cssSao}>{trangSinh?.saoTen}</span>
-        <span>{cung.cungAmDuong === -1 ? '-' : '+'}{cung.hanhCung}</span>
+         <div className="font-mono text-stone-600">{cung.cungTieuHan}</div>
+         
+         <div className={`${trangSinh?.cssSao} uppercase font-bold tracking-tight text-[9px]`}>
+            {trangSinh?.saoTen}
+         </div>
+
+         <div className="flex flex-col items-end leading-none">
+            <span className="text-[9px] opacity-70">{cung.cungAmDuong === -1 ? '(-)' : '(+)'}</span>
+            <span className="font-bold">{cung.hanhCung}</span>
+         </div>
       </div>
     </div>
   );

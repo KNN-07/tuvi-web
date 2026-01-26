@@ -34,53 +34,58 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen py-8 px-4 flex flex-col items-center">
+      <div className="w-full max-w-6xl">
         {/* Header */}
-        <h1 className="text-3xl font-bold text-center mb-6 text-red-800">
-          Lá Số Tử Vi
-        </h1>
+        <header className="mb-10 text-center fade-in">
+          <h1 className="text-4xl md:text-5xl font-bold text-red-900 mb-2 font-serif tracking-wide uppercase drop-shadow-sm">
+            Lá Số Tử Vi
+          </h1>
+          <div className="h-1 w-24 bg-red-800 mx-auto rounded-full opacity-80 mb-2"></div>
+          <p className="text-stone-600 italic">Luận giải vận mệnh - Khám phá huyền cơ</p>
+        </header>
 
-        {!chartData ? (
-          /* Birth Info Form */
-          <div className="max-w-2xl mx-auto">
-            <BirthInfoForm onSubmit={handleSubmit} />
-          </div>
-        ) : (
-          /* Chart Display */
-          <div>
-            {/* Reset button */}
-            <div className="flex justify-center mb-4">
-              <button
-                onClick={handleReset}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
-              >
-                Lập lá số mới
-              </button>
+        <main className="fade-in" style={{ animationDelay: '0.1s' }}>
+          {!chartData ? (
+            <div className="max-w-2xl mx-auto transform transition-all hover:scale-[1.01] duration-500">
+              <BirthInfoForm onSubmit={handleSubmit} />
             </div>
+          ) : (
+            <div className="animate-in fade-in zoom-in duration-500">
+              {/* Reset button - Moved to top left or integrated better? Keeping simple for now but styled */}
+              <div className="flex justify-between items-center mb-6 px-4 md:px-0">
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-2 text-stone-600 hover:text-red-800 transition-colors font-medium group"
+                >
+                  <span className="group-hover:-translate-x-1 transition-transform">←</span> Lập lá số mới
+                </button>
+                
+                {/* Mobile-friendly controls placeholder if needed */}
+              </div>
 
-            {/* Chart Grid */}
-            <ChartGrid
-              chartData={chartData}
-              onExport={handleExport}
-              showLuuStars={showLuuStars}
-              onToggleLuuStars={() => setShowLuuStars(!showLuuStars)}
-            />
+              <ChartGrid
+                chartData={chartData}
+                onExport={handleExport}
+                showLuuStars={showLuuStars}
+                onToggleLuuStars={() => setShowLuuStars(!showLuuStars)}
+              />
 
-            {/* Export Modal */}
-            <LLMExportModal
-              chartData={chartData}
-              isOpen={showExportModal}
-              onClose={handleCloseModal}
-              showLuuStars={showLuuStars}
-            />
-          </div>
-        )}
+              <LLMExportModal
+                chartData={chartData}
+                isOpen={showExportModal}
+                onClose={handleCloseModal}
+                showLuuStars={showLuuStars}
+              />
+            </div>
+          )}
+        </main>
 
         {/* Footer */}
-        <div className="text-center text-sm text-gray-500 mt-8">
-          Tử Vi Web - Phiên bản tĩnh
-        </div>
+        <footer className="text-center text-stone-500 text-sm mt-16 pb-8 border-t border-stone-200 pt-8">
+          <p>Tử Vi Web © {new Date().getFullYear()} • Phiên bản tĩnh</p>
+          <p className="text-xs mt-1 text-stone-400">Kiến tạo với sự trân trọng văn hóa phương Đông</p>
+        </footer>
       </div>
     </div>
   );

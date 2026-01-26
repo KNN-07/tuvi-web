@@ -201,7 +201,7 @@ export function LLMExportModal({ chartData, isOpen, onClose, showLuuStars = true
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
+      // Fallback
       const textarea = document.createElement('textarea');
       textarea.value = prompt;
       document.body.appendChild(textarea);
@@ -226,45 +226,49 @@ export function LLMExportModal({ chartData, isOpen, onClose, showLuuStars = true
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="card-paper max-w-4xl w-full max-h-[90vh] flex flex-col transform transition-all scale-100 overflow-hidden">
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-bold">Xuất Prompt cho AI</h2>
+        <div className="flex justify-between items-center p-5 border-b border-stone-100 bg-stone-50">
+          <h2 className="text-xl font-bold text-red-900 flex items-center gap-2">
+            <span>🤖</span> Xuất Prompt cho AI
+          </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+            className="text-stone-400 hover:text-red-600 transition-colors text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-200"
           >
             ×
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-auto p-4">
-          <div className="bg-gray-100 p-4 rounded font-mono text-sm whitespace-pre-wrap">
-            {prompt}
+        <div className="flex-1 overflow-auto p-0">
+          <div className="p-6 bg-stone-50/50">
+             <div className="bg-stone-900 text-stone-100 p-4 rounded-lg font-mono text-xs md:text-sm whitespace-pre-wrap overflow-x-auto border border-stone-800 shadow-inner leading-relaxed">
+               {prompt}
+             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 p-4 border-t">
+        <div className="flex justify-end gap-3 p-5 border-t border-stone-100 bg-white">
           <button
             onClick={handleDownload}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded"
+            className="btn-secondary flex items-center gap-2"
           >
-            Tải xuống .txt
+            <span>⬇️</span> Tải .txt
           </button>
           <button
             onClick={handleCopy}
-            className={`px-4 py-2 rounded text-white ${
-              copied ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'
+            className={`px-6 py-2 rounded font-medium text-white transition-all shadow-sm flex items-center gap-2 ${
+              copied ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
-            {copied ? 'Đã sao chép!' : 'Sao chép'}
+             {copied ? <span>✓ Đã sao chép!</span> : <span>📋 Sao chép</span>}
           </button>
           <button
             onClick={onClose}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+            className="px-4 py-2 rounded text-stone-500 hover:bg-stone-100 transition-colors"
           >
             Đóng
           </button>

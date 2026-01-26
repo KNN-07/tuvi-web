@@ -2,19 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: 'Noto Serif', serif;
-  background-color: #f5f5f5;
+@layer base {
+  body {
+    @apply font-serif text-stone-800 bg-stone-100;
+    background-image: radial-gradient(#d6d3d1 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold tracking-tight;
+  }
 }
 
-.hanh-kim { color: #9E9E9E; }
-.hanh-moc { color: #4CAF50; }
-.hanh-thuy { color: #000100; }
-.hanh-hoa { color: #a71a14; }
-.hanh-tho { color: #e6bd37; }
+@layer components {
+  .btn-primary {
+    @apply bg-red-800 hover:bg-red-900 text-white font-medium px-6 py-2 rounded shadow-sm hover:shadow transition-all duration-200 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-stone-200 hover:bg-stone-300 text-stone-800 font-medium px-4 py-2 rounded shadow-sm hover:shadow transition-all duration-200;
+  }
 
-.hanhKim { color: #9E9E9E; }
-.hanhMoc { color: #4CAF50; }
-.hanhThuy { color: #000100; }
-.hanhHoa { color: #a71a14; }
-.hanhTho { color: #e6bd37; }
+  .card-paper {
+    @apply bg-white border border-stone-200 shadow-sm rounded-lg;
+  }
+
+  .input-field {
+    @apply w-full border-stone-300 rounded-md focus:ring-2 focus:ring-red-800/20 focus:border-red-800 transition-colors shadow-sm;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-stone-100;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 rounded hover:bg-stone-400;
+}
+
+/* Wu Xing Colors - Keeping original definitions for compatibility but ensuring they work */
+.hanh-kim, .hanhKim { color: #757575; } /* Darker gray for better contrast */
+.hanh-moc, .hanhMoc { color: #2E7D32; } /* Darker green */
+.hanh-thuy, .hanhThuy { color: #1a1a1a; } /* Soft black */
+.hanh-hoa, .hanhHoa { color: #C62828; } /* Darker red */
+.hanh-tho, .hanhTho { color: #F9A825; } /* Darker yellow/gold */
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

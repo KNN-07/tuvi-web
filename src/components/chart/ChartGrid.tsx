@@ -12,15 +12,6 @@ interface Props {
 
 /**
  * Traditional 12-Palace Grid Layout (4x4 with center 2x2)
- * 
- * Layout:
- *   Tỵ(6)   Ngọ(7)   Mùi(8)   Thân(9)
- *   Thìn(5) [CENTER PANEL]    Dậu(10)
- *   Mão(4)  [SPANS 2x2  ]     Tuất(11)
- *   Dần(3)  Sửu(2)   Tý(1)    Hợi(12)
- * 
- * Note: cungSo is 1-based, maps to Địa Chi:
- * 1=Tý, 2=Sửu, 3=Dần, 4=Mão, 5=Thìn, 6=Tỵ, 7=Ngọ, 8=Mùi, 9=Thân, 10=Dậu, 11=Tuất, 12=Hợi
  */
 export function ChartGrid({ chartData, onExport, showLuuStars, onToggleLuuStars }: Props) {
   const { isHighlighted, handlePalaceClick, clearHighlight } = useHighlight();
@@ -30,7 +21,6 @@ export function ChartGrid({ chartData, onExport, showLuuStars, onToggleLuuStars 
   };
 
   // Grid positions mapping
-  // CSS Grid uses row-start/col-start positioning
   const gridPositions: { cungSo: number; gridArea: string }[] = [
     // Top row: Tỵ, Ngọ, Mùi, Thân
     { cungSo: 6, gridArea: '1 / 1 / 2 / 2' },
@@ -51,61 +41,59 @@ export function ChartGrid({ chartData, onExport, showLuuStars, onToggleLuuStars 
   ];
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-4">
       {/* Action buttons */}
-      <div className="flex justify-end gap-2 mb-2">
+      <div className="flex justify-end gap-3 print:hidden">
         {chartData.luuNien && (
           <button
             onClick={() => onToggleLuuStars()}
-            className={`px-4 py-2 rounded font-medium ${
-              showLuuStars
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-            }`}
+            className={`btn-secondary text-sm ${showLuuStars ? 'bg-red-50 text-red-800 border-red-200' : ''}`}
           >
-            {showLuuStars ? 'Ẩn' : 'Hiện'} sao Lưu {chartData.luuNien.nam}
+            {showLuuStars ? '👁️ Đang hiện' : '👁️‍🗨️ Đang ẩn'} sao Lưu {chartData.luuNien.nam}
           </button>
         )}
         <button
           onClick={onExport}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-medium"
+          className="btn-primary text-sm flex items-center gap-2"
         >
-          Xuất cho AI
+          <span>🤖</span> Luận giải AI
         </button>
       </div>
 
       {/* Grid Container */}
-      <div
-        className="grid border-2 border-gray-600"
-        style={{
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gridTemplateRows: 'repeat(4, minmax(180px, auto))',
-        }}
-      >
-        {/* 12 Palaces */}
-        {gridPositions.map(({ cungSo, gridArea }) => {
-          const cung = getCung(cungSo);
-          return (
-            <div key={cungSo} style={{ gridArea }}>
-              <Palace
-                cung={cung}
-                isHighlighted={isHighlighted(cungSo)}
-                onClick={() => handlePalaceClick(cungSo)}
-                showLuuStars={showLuuStars}
-              />
-            </div>
-          );
-        })}
+      <div className="relative p-1 bg-stone-300 rounded-lg shadow-xl overflow-hidden border border-stone-400">
+        <div
+          className="grid gap-[1px] bg-stone-300"
+          style={{
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateRows: 'repeat(4, minmax(200px, auto))',
+          }}
+        >
+          {/* 12 Palaces */}
+          {gridPositions.map(({ cungSo, gridArea }) => {
+            const cung = getCung(cungSo);
+            return (
+              <div key={cungSo} style={{ gridArea }} className="bg-white h-full relative group overflow-hidden">
+                <Palace
+                  cung={cung}
+                  isHighlighted={isHighlighted(cungSo)}
+                  onClick={() => handlePalaceClick(cungSo)}
+                  showLuuStars={showLuuStars}
+                />
+              </div>
+            );
+          })}
 
-        {/* Center Panel (spans 2x2) */}
-        <div style={{ gridArea: '2 / 2 / 4 / 4' }}>
-          <CenterPanel thienBan={chartData.thienBan} luuNien={chartData.luuNien} onClear={clearHighlight} />
+          {/* Center Panel (spans 2x2) */}
+          <div style={{ gridArea: '2 / 2 / 4 / 4' }} className="bg-stone-50 z-10 shadow-inner">
+            <CenterPanel thienBan={chartData.thienBan} luuNien={chartData.luuNien} onClear={clearHighlight} />
+          </div>
         </div>
       </div>
 
       {/* Instructions */}
-      <div className="text-center text-sm text-gray-600 mt-2">
-        Nhấn vào cung để xem Tam Hợp/Xung Chiếu. Nhấn vào trung tâm để bỏ chọn.
+      <div className="text-center text-sm text-stone-500 italic mt-2 print:hidden">
+        * Nhấn vào từng cung để xem Tam Hợp, Xung Chiếu. Nhấn vào trung tâm để bỏ chọn.
       </div>
     </div>
   );
